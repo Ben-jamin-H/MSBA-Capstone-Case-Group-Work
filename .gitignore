@@ -17,3 +17,8 @@ Thumbs.db
 
 # Kate's master data dictionary is source, not data
 !data_dictionary_combined.csv
+
+# modeling: saved fits and generated lists are rebuilt from the data, never committed
+model_cache/
+outputs/
+catboost_info/
