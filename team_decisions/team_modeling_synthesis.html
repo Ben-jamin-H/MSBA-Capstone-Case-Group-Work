@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Modeling Synthesis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* layout: one reading column for prose, full-width scrollable tables for comparisons */
+  --bg: #f7f7f4;
+  --surface: #ffffff;
+  --ink: #1d2126;
+  --muted: #5a6068;
+  --rule: #dcddd8;
+  --accent: #23577a;
+  --good: #2d7a4f;
+  --warn: #a16207;
+  --bad: #b3412f;
+  --ben: #2a78d6;
+  --erin: #c9571f;
+  --kate: #168a62;
+  --sam: #b57f00;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15181b; --surface: #1d2125; --ink: #e8e9e6; --muted: #a3a8ad; --rule: #353a40;
+    --accent: #7db4dc; --good: #6cc495; --warn: #e0b25a; --bad: #ef8a77;
+    --ben: #5c9ff0; --erin: #ec8551; --kate: #4cc196; --sam: #e2b13c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15181b; --surface: #1d2125; --ink: #e8e9e6; --muted: #a3a8ad; --rule: #353a40;
+  --accent: #7db4dc; --good: #6cc495; --warn: #e0b25a; --bad: #ef8a77;
+  --ben: #5c9ff0; --erin: #ec8551; --kate: #4cc196; --sam: #e2b13c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body); }
+main { max-width: 1120px; margin: 0 auto; padding: 40px 20px 80px; display: grid; gap: 44px; }
+.prose { max-width: 70ch; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.2; text-wrap: balance; margin: 0; }
+h1 { font-size: 2.3rem; }
+h2 { font-size: 1.6rem; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.2rem; }
+section { display: grid; gap: 16px; }
+p { margin: 0; }
+.lede { font-size: 1.08rem; color: var(--muted); }
+.note { border-left: 3px solid var(--warn); background: var(--surface); padding: 12px 16px; border-radius: 4px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--rule); border-top: 4px solid var(--c); border-radius: 6px; padding: 16px; display: grid; gap: 8px; align-content: start; }
+.card h3 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.card .lang { font: 12px var(--mono); color: var(--muted); }
+.card dl { margin: 0; display: grid; gap: 6px; font-size: 0.93rem; }
+.card dt { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.card dd { margin: 0; }
+.who { font-weight: 600; color: var(--c); }
+.ben { --c: var(--ben); } .erin { --c: var(--erin); } .kate { --c: var(--kate); } .sam { --c: var(--sam); }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); background: var(--bg); position: sticky; top: 0; }
+tbody th { font-weight: 600; width: 15%; min-width: 130px; }
+td.num { text-align: right; white-space: nowrap; }
+tr:last-child td, tr:last-child th { border-bottom: none; }
+.pill { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.yes { color: var(--good); } .no { color: var(--bad); } .part { color: var(--warn); }
+ul, ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+.agree { display: grid; gap: 12px; }
+.agree div { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; }
+.take { display: grid; gap: 14px; }
+.take article { background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--c); border-radius: 6px; padding: 16px; display: grid; gap: 8px; }
+.outline { counter-reset: s; list-style: none; padding: 0; }
+.outline li { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 16px; }
+.small { font-size: 0.85rem; color: var(--muted); }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 480px) { h1 { font-size: 1.8rem; } main { padding-top: 24px; } }
+</style>
+</head>
+<body>
+<main>
+
+<header class="prose" style="display:grid;gap:12px">
+  <p class="small">IS 6813 capstone · PBS Utah major donor prediction · compiled November 6, 2026</p>
+  <h1>Team Modeling Synthesis</h1>
+  <p class="lede">A side-by-side comparison of the four individual modeling notebooks: what each of us did, where we agree and differ, what each concluded, and what the group notebook should take from each, with reasons.</p>
+  <p class="note">Every number below comes from the repositories as they stood on November 6. All of it is synthetic data, so per Jeff's October 30 notes these results validate methods, not findings about PBS Utah's donors. Kate's notebook uses a different eligible population and different test years, so her numbers are not directly comparable to the other three (see the comparability section).</p>
+</header>
+
+<section>
+  <h2>At a glance</h2>
+  <div class="cards">
+    <div class="card ben">
+      <h3><span class="who">Benjamin</span><span class="lang">Python · Quarto</span></h3>
+      <dl>
+        <div><dt>Population</dt><dd>Group EDA definitions via the shared build script</dd></div>
+        <div><dt>Selected model</dt><dd>L1 logistic regression, tuned, 18 giving-history inputs, FY2014 training window</dd></div>
+        <div><dt>Headline</dt><dd>82.8% recall at 1,000 vs 75.4% for prior-year giving (+7.4); +2.7 on pre-program years</dd></div>
+        <div><dt>Distinctive</dt><dd>21-family screen, rules set before each test, 3 and 5 year models, retention, synthetic-data checks</dd></div>
+      </dl>
+    </div>
+    <div class="card erin">
+      <h3><span class="who">Erin</span><span class="lang">Python · scripts + report</span></h3>
+      <dl>
+        <div><dt>Population</dt><dd>Group EDA definitions, rebuilt in her own builder</dd></div>
+        <div><dt>Selected model</dt><dd>Untuned L2 logistic regression (C = 1), 14 core inputs, FY2021 window</dd></div>
+        <div><dt>Headline</dt><dd>80.6% recall at 1,000 vs 75.4% (+5.2); gain comes from former major donors</dd></div>
+        <div><dt>Distinctive</dt><dd>Saved, hash-checked model artifact with control-safe scoring; list composition analysis</dd></div>
+      </dl>
+    </div>
+    <div class="card kate">
+      <h3><span class="who">Kate</span><span class="lang">Python · Quarto</span></h3>
+      <dl>
+        <div><dt>Population</dt><dd>Her own EDA definitions, including lapsed donors</dd></div>
+        <div><dt>Selected model</dt><dd>L2 logistic regression (C = 0.3) with log dollars and giving bands; LightGBM as cross-check</dd></div>
+        <div><dt>Headline</dt><dd>77% vs 69% on FY2024 and FY2025; never-major 58% vs 49%</dd></div>
+        <div><dt>Distinctive</dt><dd>Who the model finds that the baseline misses; 3-year total baseline; gender coverage audit</dd></div>
+      </dl>
+    </div>
+    <div class="card sam">
+      <h3><span class="who">Samantha</span><span class="lang">R · Quarto</span></h3>
+      <dl>
+        <div><dt>Population</dt><dd>Never-major active donors as the primary model; former and current majors separate</dd></div>
+        <div><dt>Selected model</dt><dd>Prior-year ranking for prospects; giving-history ridge for retention risk</dd></div>
+        <div><dt>Headline</dt><dd>Ridge 61.0% vs 57.6% for never-major (+3.2, not reliable); retention ridge beats benchmark</dd></div>
+        <div><dt>Distinctive</dt><dd>Three separate workflows: prospects, retention risk, former-major reactivation</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>How each of us set up the problem</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Topic</th><th class="ben"><span class="who">Benjamin</span></th><th><span class="who erin">Erin</span></th><th><span class="who kate">Kate</span></th><th><span class="who sam">Samantha</span></th></tr></thead>
+      <tbody>
+        <tr><th>Cleaning and panel</th><td>Group shared build script, unchanged</td><td>Group definitions rebuilt in her own scripts; reproduces the group's baseline numbers exactly</td><td>Her EDA rules: copy rows dropped by label, legacy gifts credited to every linked person</td><td>Content-based copy rules audited against labels; legacy to first-listed person</td></tr>
+        <tr><th>Eligible donors</th><td>Gave in FY t, not major; former majors kept and flagged</td><td>Same as Benjamin</td><td>Anyone who has ever given and gave under $1,200 in FY t, so lapsed donors are included (293 converters FY2021 to FY2025)</td><td>Primary model: active never-major donors only (131 converters). Former majors and current majors handled separately</td></tr>
+        <tr><th>Household rule</th><td>Group rule (one couple-year affected)</td><td>Group rule</td><td>None</td><td>Requires reciprocal spouse links; found none, so no couples combined</td></tr>
+        <tr><th>Training window</th><td>FY2014 onward (chosen after testing FY2021, FY2014, FY1999, and a weighted window)</td><td>FY2021 onward</td><td>FY2021 onward</td><td>FY2021 onward</td></tr>
+        <tr><th>Test design</th><td>Rolling FY2022 to FY2024; FY2025 once after selection; FY2018 to FY2021 pre-program test</td><td>Rolling FY2022 to FY2024; FY2025 once after selection</td><td>Choices made on FY2022 and FY2023; tested on FY2024 and FY2025 together</td><td>Rolling FY2022 to FY2024</td></tr>
+        <tr><th>Uncertainty</th><td>Couple-clustered bootstrap, paired differences, 95% rule</td><td>Couple-clustered bootstrap, paired differences</td><td>Sign test on converters found by only one list</td><td>Donor-clustered bootstrap (2,000 draws), paired differences</td></tr>
+        <tr><th>Models tried</th><td>21 families screened (linear, Bayes, k-NN, SVMs, trees, forests, boosting, EBM, MLP), then 4 tuned, then ensembles</td><td>Dummy, logistic, random forest, histogram boosting (all untuned)</td><td>Logistic and LightGBM (tuned on development years), rank-average ensemble</td><td>Continuous ridge, threshold-aware ridge, shallow tree, Firth logistic</td></tr>
+        <tr><th>Tuning</th><td>Nested grouped CV; compared four tuning measures</td><td>None, by design</td><td>Development-fold PR-AUC</td><td>Penalty tuned inside each training window</td></tr>
+        <tr><th>Contact flags</th><td>Training only, off at scoring; later shown not to change the ranking</td><td>Training only, off at scoring</td><td>Not used; robustness check trained without contacted rows</td><td>Not used</td></tr>
+        <tr><th>Engagement data</th><td>Tested as feature groups; adds nothing</td><td>Optional inputs, not in final model</td><td>Tested; adds nothing</td><td>Tested with strictly pre-snapshot data; adds nothing</td></tr>
+        <tr><th>3 and 5 year outcomes</th><td>3-year logistic and 5-year EBM, tested on legacy-era cohorts, reported as projections</td><td>Datasets built, not modeled</td><td>12-month score evaluated on 3-year outcomes; no separate model</td><td>Described only</td></tr>
+        <tr><th>Giving tier</th><td>Rule vs multinomial vs ordinal; no approach beats "always $1,200"</td><td>Not modeled</td><td>Majority vs history rule vs multinomial; two-level tier recommended</td><td>Not modeled</td></tr>
+        <tr><th>Retention of current majors</th><td>L1 logistic risk ranking with dollars at risk</td><td>Not modeled</td><td>Not modeled</td><td>Ridge risk ranking at top-25 and top-50 capacity</td></tr>
+        <tr><th>Former-major reactivation</th><td>Inside the main model (flagged)</td><td>Inside the main model</td><td>Inside the main model</td><td>Separate workflow</td></tr>
+        <tr><th>FY2026 list</th><td>1,000 immediate + 2,000 nurture with drivers; 131-donor risk list</td><td>38,219 scored, top 1,000, saved model artifact</td><td>144,541 scored, 1,000 + 4,000 watch list with drivers and tier</td><td>Not produced, by design</td></tr>
+        <tr><th>Jeff's Oct 30 notes</th><td><span class="pill yes">Applied</span> framing, refit without contact, not-selected pool, pre-program test, age</td><td><span class="pill no">Before the notes</span></td><td><span class="pill no">Not applied</span></td><td><span class="pill no">Not applied</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Results on a common measure</h2>
+  <p class="prose">Recall at a list of 1,000 per year on FY2022 to FY2024, with the paired gain over ranking by prior-year giving (95% interval). Benjamin's and Erin's baselines match the group EDA exactly, so their rows can be compared directly. Samantha's model covers never-major donors only. Kate's row uses a different population and test years.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Notebook and model</th><th>All eligible</th><th>Gain vs prior-year</th><th>Never-major</th><th>Never-major gain</th><th>FY2025 check</th></tr></thead>
+      <tbody>
+        <tr><th><span class="who ben">Benjamin</span> L1 logistic</th><td class="num">82.8%</td><td class="num">+7.4 (2.6 to 12.3)</td><td class="num">64.4%</td><td class="num">+4.8 (−5.1 to 12.6)</td><td class="num">75.3%</td></tr>
+        <tr><th><span class="who ben">Benjamin</span> same model, FY2018 to FY2021</th><td class="num">85.3%</td><td class="num">+2.7 (0.3 to 5.3)</td><td class="num">75.2%</td><td class="num">+1.6 (−1.8 to 5.4)</td><td class="num">n/a</td></tr>
+        <tr><th><span class="who erin">Erin</span> untuned logistic</th><td class="num">80.6%</td><td class="num">+5.2 (0.7 to 9.5)</td><td class="num">59.3%</td><td class="num">−0.3 (−8.0 to 7.2)</td><td class="num">67.9%</td></tr>
+        <tr><th><span class="who erin">Erin</span> untuned random forest</th><td class="num">77.1%</td><td class="num">not reported</td><td class="num">54.4%</td><td class="num">not reported</td><td class="num">n/a</td></tr>
+        <tr><th><span class="who erin">Erin</span> untuned histogram boosting</th><td class="num">33.6%</td><td class="num">below</td><td class="num">25.4%</td><td class="num">below</td><td class="num">n/a</td></tr>
+        <tr><th><span class="who sam">Samantha</span> continuous ridge</th><td class="num">n/a</td><td class="num">n/a</td><td class="num">61.0%</td><td class="num">+3.2 (−6.2 to 13.3)</td><td class="num">n/a</td></tr>
+        <tr><th><span class="who sam">Samantha</span> shallow tree</th><td class="num">n/a</td><td class="num">n/a</td><td class="num">1.7%</td><td class="num">−57.0</td><td class="num">n/a</td></tr>
+        <tr><th><span class="who kate">Kate</span> logistic, FY2024 and FY2025</th><td class="num">77%</td><td class="num">+8 (14 vs 2 converters, p = 0.004)</td><td class="num">58%</td><td class="num">+9</td><td class="num">74% (as a test year)</td></tr>
+        <tr><th>Prior-year ranking (group bar)</th><td class="num">75.4%</td><td class="num">bar</td><td class="num">59.6%</td><td class="num">bar</td><td class="num">69.2%</td></tr>
+        <tr><th>Former major or $500 rule</th><td class="num">76.6%</td><td class="num">+1.2 (−3.5 to 5.6)</td><td class="num">47.1%</td><td class="num">−12.5</td><td class="num">n/a</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Retention of current major donors</th><th>Measure</th><th>Model</th><th>Benchmark</th><th>Paired gain</th></tr></thead>
+      <tbody>
+        <tr><th><span class="who sam">Samantha</span> ridge</th><td>Recall of droppers in top 25 per year</td><td class="num">32.5%</td><td class="num">23.1% (decline and recency)</td><td class="num">+9.1 (3.4 to 15.1)</td></tr>
+        <tr><th><span class="who sam">Samantha</span> ridge</th><td>Recall of droppers in top 50 per year</td><td class="num">59.8%</td><td class="num">47.3%</td><td class="num">+10.8 (4.0 to 18.1)</td></tr>
+        <tr><th><span class="who ben">Benjamin</span> L1 logistic</th><td>ROC AUC</td><td class="num">0.64</td><td class="num">0.59 (closest to $1,200)</td><td class="num">+0.057 (0.010 to 0.108)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small prose">Both retention analyses use the same donors: 118, 102, 114, 83, and 86 major donors in FY2021 to FY2025, of whom 73, 50, 73, 46, and 45 fell below $1,200 the next year.</p>
+</section>
+
+<section>
+  <h2>Where we agree</h2>
+  <div class="agree prose">
+    <div><strong>Penalized logistic regression is the right prospect model.</strong> All four of us ended on a regularized logistic regression or a simple ranking. Flexible trees failed or overfit without heavy regularization: Erin's untuned histogram boosting reached 33.6%, Samantha's shallow tree 1.7%, and in Benjamin's screen LightGBM, histogram boosting, and the single tree fell below the bar, with XGBoost catching up only once tuning forced shallow, heavily regularized trees. Kate's tuned LightGBM only tied her logistic model.</div>
+    <div><strong>Giving history carries the signal.</strong> Solicitation and Passport viewing added nothing measurable in any notebook, whether tested in the same year (Benjamin, Kate) or strictly before the snapshot (Samantha: +0.7 points, −3.2 to 5.0).</div>
+    <div><strong>The model helps overall, mostly by ranking former major donors.</strong> Erin's list composition shows it directly: her logistic list captured 74 of 75 former-major converters against 67 for prior-year giving, and 34 of 59 never-major converters against 34. Kate found the extra converters were $100 to $250 donors with a past major year, a soft credit, or a long record. Benjamin's drivers point the same way (former major status, largest gift).</div>
+    <div><strong>Never-major donors are not reliably improved at 12 months.</strong> Benjamin +4.8, Erin −0.3, and Samantha +3.2 all have intervals that include zero. Kate's +9 is the exception, but it uses a different population and test years.</div>
+    <div><strong>Probabilities rank well but their level drifts.</strong> Every notebook found the top of the list roughly calibrated and the year totals off: Erin's FY2025 check predicted 0.108% against 0.246% observed, Benjamin's predicted 48% of FY2025 conversions, and Kate's yearly totals ran 0.67 to 1.57 times expected.</div>
+    <div><strong>The tier cannot be predicted beyond "most land at $1,200".</strong> Kate (53% for always guessing the lowest tier, nothing better) and Benjamin (59%, multinomial measurably worse) agree.</div>
+    <div><strong>Retention risk can be ranked.</strong> The two notebooks that tried it, Samantha's and Benjamin's, both beat their simple benchmarks on the same donors.</div>
+  </div>
+</section>
+
+<section>
+  <h2>Where we differ, and why it matters</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Difference</th><th>What happened</th><th>Why it matters</th></tr></thead>
+      <tbody>
+        <tr><th>Eligible population</th><td>Kate includes lapsed donors and credits legacy gifts to every linked person; Samantha models never-major donors only</td><td>Kate's 77% and 58% cannot be compared with the group bars. Her never-major gain, the strongest in the team, needs a rerun on the group population before the group can rely on it.</td></tr>
+        <tr><th>Use of FY2025</th><td>Kate used FY2025 as a test year; Benjamin and Erin held it out and checked it once</td><td>The team agreed (decision 9) to keep FY2025 out of model choice. Kate's choices were made on FY2022 and FY2023, so her selection is still clean, but her reported test result mixes in the influx year.</td></tr>
+        <tr><th>Tuning</th><td>Erin untuned; Benjamin nested tuning; Kate development-fold tuning</td><td>Small effect: Benjamin found tuning and the tuning measure changed recall by at most about a point. Erin's untuned model is a fair, simpler baseline.</td></tr>
+        <tr><th>Training window</th><td>Benjamin FY2014 onward; everyone else FY2021 onward</td><td>No measurable difference in recall in Benjamin's comparison, but FY2014 gives tuning about three times as many converters to work with.</td></tr>
+        <tr><th>Contact flags</th><td>Benjamin and Erin used them in training only; Kate and Samantha left them out</td><td>Benjamin's refit without them gave an identical top 1,000, so dropping them costs nothing and removes an invented table from the model.</td></tr>
+        <tr><th>Synthetic-data framing</th><td>Only Benjamin's notebook applies Jeff's October 30 notes</td><td>81% of the FY2022 to FY2024 converters were officer-selected, because simulated contact steered conversion. On pre-program years Benjamin's gain shrank from +7.4 to +2.7. Every team result on FY2022 to FY2024 is likely flattered the same way.</td></tr>
+        <tr><th>Prior-year baseline value</th><td>Samantha's never-major prior-year recall is 57.6%; the group's is 59.6% on the same 59 converters</td><td>Probably tie handling at the $600 cluster (fractional splitting versus a fixed order). Worth aligning so the bars match.</td></tr>
+        <tr><th>Households</th><td>Samantha required reciprocal spouse links and found none</td><td>The group rule, confirmed by PBS, links one-directional spouse records. It touches one couple-year, so results barely change, but the group notebook should use one rule.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>What each of us concluded</h2>
+  <div class="take">
+    <article class="ben"><h3 class="who">Benjamin</h3><p>The tuned L1 logistic regression beats the prior-year ranking and the former major or $500 rule, though the cleaner pre-program test suggests a gain of a few points rather than seven. Never-major donors are not reliably helped at 12 months; the 5-year boosting machine is the only model that clears that bar (+2.2). Major donors who drop give up about as much a year as new major donors give, so retention is the first test recommended to PBS, followed by a backtest on its own records, contact logging with a holdout, and yearly capacity snapshots.</p></article>
+    <article class="erin"><h3 class="who">Erin</h3><p>Untuned logistic regression is selected on its overall recall. Its gain comes from former-major capture, not never-major outreach, and the probabilities are uncalibrated and should be used for ranking only. The final model is saved, reload-tested, and has scored FY2026; household de-duplication and staff review are needed before any use.</p></article>
+    <article class="kate"><h3 class="who">Kate</h3><p>Logistic regression beats both simple rules modestly and helps most for never-major donors by lifting lower-giving donors with strong history above the $600 tier. Complexity does not pay, engagement adds nothing, a separate 3-year model cannot yet be tested, and the tier should be a two-level weak indicator. Next steps are uplift using the holdout and a look at why Unknown-gender records are over-represented on the list.</p></article>
+    <article class="sam"><h3 class="who">Samantha</h3><p>PBS should run three workflows. For never-major prospects, prior-year giving remains the operational choice because ridge's gain was not reliable. For current majors, the giving-history ridge reliably ranks retention risk. For former majors, prior-year giving is enough. Every list is decision support to be validated against real outreach results.</p></article>
+  </div>
+</section>
+
+<section>
+  <h2>What to synthesize, and why</h2>
+  <div class="take">
+    <article class="sam"><h3>Structure: Samantha's three workflows</h3><p>Organize the group notebook around prospects, retention risk, and former-major reactivation. It matches what PBS's major gift officers asked for (retention), and Erin's composition result explains why it works: the overall gain is mostly former-major capture, so separating that group makes each list's value visible.</p></article>
+    <article class="ben"><h3>Data and rules: the shared build and pre-set rules</h3><p>Use the group's shared build script for every model; Erin's rebuild already reproduces its numbers exactly, which confirms it. Kate's and Samantha's models should be rerun on it. Keep the practice of setting decision rules before each comparison, which Benjamin, Kate, and Erin all used in some form.</p></article>
+    <article class="ben"><h3>Validation: rolling test plus two checks</h3><p>Rolling FY2022 to FY2024 (Benjamin, Erin, Samantha), the FY2025 check run once (Benjamin, Erin), and the FY2018 to FY2021 pre-program test that Jeff's notes call for (Benjamin). Report paired couple-clustered intervals (Benjamin, Erin) and add Kate's count of converters found by only one list, which is the easiest version for a non-technical audience.</p></article>
+    <article class="erin"><h3>Prospect model: one penalized logistic regression</h3><p>All four agree on the family. Benjamin's tuned L1 and Erin's untuned L2 are within about two points, so pick one under a pre-set rule and show the other as a check. Drop the contact flags, since they change nothing. Add Kate's log-dollar and giving-band terms as the tested way to handle the $600 cluster.</p></article>
+    <article class="kate"><h3>Explaining the gain: Erin's and Kate's breakdowns</h3><p>Erin's list composition (former versus never major) and Kate's band table (who the model finds that the baseline misses) together tell staff why the list differs from a dollar sort. Add Kate's 3-year total as a second simple baseline.</p></article>
+    <article class="sam"><h3>Retention: Samantha's capacity framing with Benjamin's risk list</h3><p>Use Samantha's top-25 and top-50 evaluation, which matches how officers would work a short list, and report dollars exposed as she does. Add Benjamin's FY2026 risk list of current major donors as the deliverable.</p></article>
+    <article class="ben"><h3>Longer windows and tier</h3><p>Use Benjamin's 3-year and 5-year models as projections, with Kate's finding that late converters look like everyone else as the caveat. Report the tier as Kate's two-level indicator or Benjamin's expected mix, since nobody could predict it.</p></article>
+    <article class="erin"><h3>Deliverables: Erin's artifact discipline</h3><p>Ship the final model the way Erin did: a saved, hash-checked pipeline whose scoring always switches training-only inputs off. Pair it with Benjamin's working queue and Kate's per-donor drivers, expected-converter range, and gender coverage audit.</p></article>
+  </div>
+</section>
+
+<section>
+  <h2>Proposed group notebook outline</h2>
+  <ol class="outline prose">
+    <li><strong>Introduction and data framing.</strong> Business problem, the three workflows, and Jeff's synthetic-data notes up front.</li>
+    <li><strong>Shared data and features.</strong> The group build script; giving-history features with Kate's bands; leakage checks.</li>
+    <li><strong>Benchmarks.</strong> Prior-year giving, former major or $500, 3-year total, and decline and recency for retention.</li>
+    <li><strong>Prospect model.</strong> Model families compared under one rule; never-major results reported separately; the gain explained through list composition and the band table.</li>
+    <li><strong>Validation checks.</strong> FY2025 once, pre-program FY2018 to FY2021, donors not selected for cultivation.</li>
+    <li><strong>Retention and reactivation.</strong> Current-major risk at officer capacity, with dollars at risk; former-major reactivation against prior-year giving.</li>
+    <li><strong>Longer windows and tier.</strong> As projections and an expected mix.</li>
+    <li><strong>FY2026 lists and model artifact.</strong> Working queue, risk list, saved model, coverage audit.</li>
+    <li><strong>Results and tests for PBS.</strong> Framed as methods PBS can run on its own records.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Decisions for the team</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Decision</th><th>Options</th><th>Recommendation</th></tr></thead>
+      <tbody>
+        <tr><th>Headline population</th><td>All eligible with former majors flagged (group decision 3), or Samantha's split workflows</td><td>Keep all eligible for the headline bar, and present results by workflow</td></tr>
+        <tr><th>Prospect model</th><td>Tuned L1 (Benjamin), untuned L2 (Erin), L2 with bands (Kate)</td><td>Set a rule first, then choose; they are within about two points</td></tr>
+        <tr><th>Training window</th><td>FY2014 onward or FY2021 onward</td><td>FY2014 onward for more converters in tuning; no measurable recall difference</td></tr>
+        <tr><th>Contact flags</th><td>Training-only, or dropped</td><td>Dropped: no change to the ranking, and the table is invented</td></tr>
+        <tr><th>Lapsed donors</th><td>Reported separately (decision 2), or Kate's separate reactivation list</td><td>Reported separately, with Kate's lapsed-only list as an optional view</td></tr>
+        <tr><th>Tie handling</th><td>Fractional splitting or fixed random order</td><td>Fractional splitting, used by the group EDA, so every bar matches</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small prose">Sources: Benjamin, github.com/Ben-jamin-H/MSBA-Capstone-Case-Comp-Individual-Work; Erin, github.com/u6062992/Capstone (Modeling folder and its result tables); Kate, github.com/kateklinger6/MSBA_CAPSTONE_2 (Modeling_Individual_Kate_Klinger); Samantha, github.com/samantha-whuang/MSBA-Capstone-PBS-Project (pbs_utah_modeling and its rendered HTML).</p>
+</section>
+
+</main>
+</body>
+</html>

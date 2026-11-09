@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Group Modeling Decisions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* layout: summary table first, then one card per decision with its options side by side */
+  --bg: #f6f6f3;
+  --surface: #ffffff;
+  --ink: #1c2025;
+  --muted: #5a6068;
+  --rule: #dbdcd7;
+  --accent: #23577a;
+  --ok: #2d7a4f;
+  --amend: #a15c07;
+  --add: #3c5fa8;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171a; --surface: #1c2024; --ink: #e8e9e6; --muted: #a2a7ac; --rule: #343a40;
+    --accent: #7db4dc; --ok: #6cc495; --amend: #e2a654; --add: #8fb0f0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171a; --surface: #1c2024; --ink: #e8e9e6; --muted: #a2a7ac; --rule: #343a40;
+  --accent: #7db4dc; --ok: #6cc495; --amend: #e2a654; --add: #8fb0f0; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body); }
+main { max-width: 1120px; margin: 0 auto; padding: 40px 20px 80px; display: grid; gap: 40px; }
+.prose { max-width: 72ch; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.2; text-wrap: balance; margin: 0; }
+h1 { font-size: 2.3rem; }
+h2 { font-size: 1.55rem; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.15rem; }
+p { margin: 0; }
+section { display: grid; gap: 16px; }
+.lede { font-size: 1.06rem; color: var(--muted); }
+.small { font-size: 0.85rem; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 0.88rem; }
+.pill { display: inline-block; font-size: 0.74rem; font-weight: 600; padding: 1px 9px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.ok { color: var(--ok); } .amend { color: var(--amend); } .add { color: var(--add); }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); background: var(--bg); }
+tr:last-child td, tr:last-child th { border-bottom: none; }
+td.id, th.id { font-family: var(--mono); white-space: nowrap; color: var(--muted); }
+.decision { background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--c, var(--accent)); border-radius: 6px; padding: 18px; display: grid; gap: 12px; }
+.decision.s-ok { --c: var(--ok); } .decision.s-amend { --c: var(--amend); } .decision.s-add { --c: var(--add); }
+.decision header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline; }
+.decision .why { color: var(--muted); }
+.fit { font-size: 0.88rem; background: var(--bg); border-radius: 4px; padding: 8px 12px; }
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+.opt { border: 1px solid var(--rule); border-radius: 6px; padding: 12px; display: grid; gap: 6px; align-content: start; font-size: 0.92rem; }
+.opt.rec { border: 2px solid var(--accent); }
+.opt h4 { margin: 0; font-size: 0.95rem; display: flex; justify-content: space-between; gap: 8px; }
+.opt .tag { font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.opt ul { margin: 0; padding-left: 1.15em; display: grid; gap: 3px; }
+.lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.rec-line { font-size: 0.95rem; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 480px) { h1 { font-size: 1.8rem; } }
+</style>
+</head>
+<body>
+<main>
+
+<header class="prose" style="display:grid;gap:12px">
+  <p class="small">IS 6813 capstone · PBS Utah major donor prediction · for the group modeling notebook · November 6, 2026</p>
+  <h1>Group Modeling Decisions</h1>
+  <p class="lede">The choices the team has to make before building the group modeling notebook, why each one needs a decision, the options with their pros and cons, and a recommendation. Every option is checked against the group EDA's 15 agreed decisions and the revised Business Problem Statement (BPS).</p>
+  <p>The companion page, <a href="team_modeling_synthesis.html">Team Modeling Synthesis</a>, shows what each of us did. Three things have happened since the EDA and BPS were agreed, and several decisions turn on them: Jeff's October 30 data notes (the cultivation tables are invented and simulated contact shapes the FY2022 to FY2024 outcomes; age has no planted effect; second gifts are twice the real rate; results validate methods, not findings), PBS Utah's confirmation of the household rule, and PBS's request for a ranking of current major donors at risk of dropping.</p>
+  <p class="fit" style="border-left:4px solid var(--ok)"><strong>Status, November 6:</strong> all 22 recommendations accepted. The Business Problem Statement may be revised to reflect the EDA and modeling, including the two amendments in D14 and D19.</p>
+  <div class="legend">
+    <span><span class="pill ok">Consistent</span> the recommendation follows the EDA and BPS as written</span>
+    <span><span class="pill add">Adds</span> a check or view the EDA and BPS do not mention but do not rule out</span>
+    <span><span class="pill amend">Amends</span> the recommendation changes the EDA or BPS, so the team document needs a revision</span>
+  </div>
+</header>
+
+<section>
+  <h2>Summary</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th class="id">#</th><th>Decision</th><th>Recommendation</th><th>EDA and BPS</th></tr></thead>
+      <tbody>
+        <tr><td class="id">D1</td><td>Data build</td><td>Everyone uses the shared group build script</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D2</td><td>Household rule</td><td>The group rule, now confirmed by PBS</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D3</td><td>Who is eligible in the headline model</td><td>All active non-major donors, former majors flagged; lapsed reported separately</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D4</td><td>Ties at the list cutoff</td><td>Split evenly, as in the EDA</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D5</td><td>Main test design</td><td>Rolling FY2022 to FY2024; FY2025 once after the choice, then retrain</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D6</td><td>Pre-program check</td><td>Add a FY2018 to FY2021 test, reported, not used to choose</td><td><span class="pill add">Adds</span></td></tr>
+        <tr><td class="id">D7</td><td>Training window, 12 month model</td><td>FY2021 onward as the main model; FY2014 onward as a sensitivity</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D8</td><td>How a model "wins"</td><td>Paired couple-clustered bootstrap, interval above zero, simplest model on ties</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D9</td><td>Prospect model</td><td>Compare the logistic variants we each used under one rule set in advance</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D10</td><td>Inputs</td><td>Backtest with all inputs, final model on giving history; keep age only as a tested input</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D11</td><td>Contact flags</td><td>Keep them training-only as agreed, and report that removing them changes nothing</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D12</td><td>Reporting groups</td><td>All, never-major, no-contact, plus donors not selected for cultivation</td><td><span class="pill add">Adds</span></td></tr>
+        <tr><td class="id">D13</td><td>Benchmarks</td><td>The EDA's set, with officer selection labeled illustrative and a 3-year total ranking added</td><td><span class="pill add">Adds</span></td></tr>
+        <tr><td class="id">D14</td><td>How results are framed</td><td>As validated methods and tests PBS should run on its own records</td><td><span class="pill amend">Amends</span></td></tr>
+        <tr><td class="id">D15</td><td>3 to 5 year outcome</td><td>Giving-history models on earlier cohorts, reported as projections</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D16</td><td>Giving tier</td><td>Evaluate three tiers as the BPS says; display an expected mix</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D17</td><td>Calibration</td><td>Report it; give staff an expected-converter range, not a point</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D18</td><td>Dashboard segments</td><td>Top 1,000 by the 12 month model; nurture ranked by the 3 to 5 year model</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D19</td><td>Retention of current major donors</td><td>Add as a second workflow, with a risk ranking and dollars at risk</td><td><span class="pill amend">Amends</span></td></tr>
+        <tr><td class="id">D20</td><td>Former-major reactivation</td><td>Keep in the main model; report former majors separately</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D21</td><td>Final model artifact</td><td>A saved, checked pipeline that always scores with contact off</td><td><span class="pill ok">Consistent</span></td></tr>
+        <tr><td class="id">D22</td><td>Household de-duplication of the list</td><td>Person-level list with a couple flag; roll-up stays a later addition</td><td><span class="pill ok">Consistent</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Data and population</h2>
+
+  <article class="decision s-ok">
+    <header><h3>D1. Data build</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why it needs a decision: we built four different panels. Erin's rebuild reproduces the group numbers exactly; Kate's uses her own copy and legacy rules, and Samantha's uses her own household rule, so their headline numbers cannot be compared with the group bars.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decision 12 (one shared Python build), decisions 1 and 4 (content-based copy rules, legacy gifts to the first listed person). BPS Scope delivers "a cleaned donor-level dataset".</p>
+    <div class="options">
+      <div class="opt rec"><h4>Shared group build script for everyone <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>One set of counts, bars, and definitions</li><li>Already reproduces the published EDA numbers</li></ul><span class="lbl">Cons</span><ul><li>Kate and Samantha must rerun their models</li><li>Samantha's R work needs the panel exported to a file</li></ul></div>
+      <div class="opt"><h4>Keep each person's pipeline</h4><span class="lbl">Pros</span><ul><li>No rework</li></ul><span class="lbl">Cons</span><ul><li>Results cannot be compared or combined</li><li>Breaks EDA decision 12</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> the shared build. Export its feature table to Parquet and CSV so the R workflow can read the same rows.</p>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D2. Household rule</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: Samantha's notebook counts a couple only when both spouse records point to each other, and she found no such pairs, so her notebook combines no couples. Kate uses no household rule.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decision 15; BPS Analytics Approach ("a couple whose combined giving reaches $1,200 counts as one major donor"). PBS has confirmed the rule.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Group rule <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Agreed, written into the BPS, and confirmed by PBS</li></ul><span class="lbl">Cons</span><ul><li>Affects only one couple-year, so it adds little</li></ul></div>
+      <div class="opt"><h4>Reciprocal links only</h4><span class="lbl">Pros</span><ul><li>Stricter evidence that two records are a couple</li></ul><span class="lbl">Cons</span><ul><li>Combines no one in this data, which contradicts the confirmed rule</li></ul></div>
+    </div>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D3. Who is eligible in the headline model</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: we used three populations. Erin and Benjamin used all active non-major donors with former majors flagged. Samantha modeled never-major donors only, and Kate included lapsed donors.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decisions 2 and 3 (gave in FY t and not major; former majors kept and flagged; lapsed reported separately). BPS: "each current non-major donor", results "overall and for never-major donors".</p>
+    <div class="options">
+      <div class="opt rec"><h4>All active non-major, former majors flagged <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Matches the EDA and BPS and the 75.4% bar</li><li>Never-major results still reported separately</li></ul><span class="lbl">Cons</span><ul><li>Former majors dominate the overall gain, which can hide the never-major result unless it is shown next to it</li></ul></div>
+      <div class="opt"><h4>Never-major only (Samantha)</h4><span class="lbl">Pros</span><ul><li>Focuses on the donors staff do not already know</li></ul><span class="lbl">Cons</span><ul><li>Drops about half the converters and the agreed bar</li><li>Former majors would need their own list</li></ul></div>
+      <div class="opt"><h4>Include lapsed donors (Kate)</h4><span class="lbl">Pros</span><ul><li>Can surface lapsed donors who come back</li></ul><span class="lbl">Cons</span><ul><li>Lapsed donors rarely reach the top 1,000; breaks decision 2</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> keep decisions 2 and 3. Report lapsed donors with their base rate, and include Kate's lapsed-only list as an optional view.</p>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D4. Ties at the list cutoff</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: many donors give exactly $600, so how ties are broken moves recall by a couple of points. Samantha's never-major baseline is 57.6% against the group's 59.6% on the same 59 converters, most likely for this reason.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decision 10 ("ties at the cutoff are split evenly").</p>
+    <div class="options">
+      <div class="opt rec"><h4>Split ties evenly <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Agreed; independent of row order or a seed</li></ul><span class="lbl">Cons</span><ul><li>Fractional counts are harder to explain than a list</li></ul></div>
+      <div class="opt"><h4>Fixed random order (Kate)</h4><span class="lbl">Pros</span><ul><li>Produces an actual list of names</li></ul><span class="lbl">Cons</span><ul><li>Results depend on the seed; bars will not match</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> split evenly for evaluation, and use a fixed random order only to print the FY2026 list.</p>
+  </article>
+</section>
+
+<section>
+  <h2>Validation</h2>
+
+  <article class="decision s-ok">
+    <header><h3>D5. Main test design</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: Kate chose on FY2022 and FY2023 but reported FY2024 and FY2025 together as her test, which brings the influx year into the reported result.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decision 9; BPS: FY2025 kept "out of validation; it is used only in final training and reported once as a labeled check".</p>
+    <div class="options">
+      <div class="opt rec"><h4>Rolling FY2022 to FY2024; FY2025 once, then retrain <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Written into the EDA and BPS</li><li>Three of four notebooks already do this</li></ul><span class="lbl">Cons</span><ul><li>Only 134 test converters</li></ul></div>
+      <div class="opt"><h4>Development and test folds (Kate)</h4><span class="lbl">Pros</span><ul><li>A clean separation between choosing and testing</li></ul><span class="lbl">Cons</span><ul><li>Uses FY2025 as a test year, against the BPS</li></ul></div>
+    </div>
+  </article>
+
+  <article class="decision s-add">
+    <header><h3>D6. Pre-program check</h3><span class="pill add">Adds</span></header>
+    <p class="why">Why: Jeff's notes say simulated contact steered conversion toward officer-selected donors from FY2023 on. 81% of the FY2022 to FY2024 converters were selected, and Benjamin's gain fell from +7.4 to +2.7 points on the years before the program.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> neither mentions it. The BPS asks for backtesting "on held-out historical periods" and for controlling officer contact, which this supports. Training for FY2018 needs FY2014 to FY2017 cohorts, which have giving history only, the same rule the BPS sets for the 3 to 5 year outcome.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Add FY2018 to FY2021 as a reported check <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>The only test free of simulated contact</li><li>Answers Jeff's notes directly</li></ul><span class="lbl">Cons</span><ul><li>A second set of numbers to explain</li><li>Uses legacy-era cohorts</li></ul></div>
+      <div class="opt"><h4>Skip it</h4><span class="lbl">Pros</span><ul><li>Simpler</li></ul><span class="lbl">Cons</span><ul><li>The headline gain is likely overstated, and the presentation would not say so</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> add it, under a rule set beforehand: it is the more trustworthy estimate of propensity, but it cannot change the selected model.</p>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D7. Training window for the 12 month model</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: Benjamin trained on FY2014 onward; the other three on FY2021 onward. Benjamin's comparison found no measurable difference in recall, but FY2014 gives tuning about three times as many converters.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decision 5 (snapshots FY2021 to FY2025) and the modeling recommendation ("all features are available from FY2021"); BPS: the 12 month outcome is backtested with all inputs, which only exist from FY2021.</p>
+    <div class="options">
+      <div class="opt rec"><h4>FY2021 onward, with FY2014 as a sensitivity <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Follows decision 5 and the BPS</li><li>Every input is observed in every training row</li></ul><span class="lbl">Cons</span><ul><li>Only 55 to 145 converters for tuning, so tuning is noisy</li></ul></div>
+      <div class="opt"><h4>FY2014 onward (Benjamin)</h4><span class="lbl">Pros</span><ul><li>Steadier tuning</li><li>Slightly better for never-major donors in the point estimate</li></ul><span class="lbl">Cons</span><ul><li>Engagement inputs missing for most training rows</li><li>Needs a revision to decision 5</li></ul></div>
+    </div>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D8. How a model "wins"</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: Erin chose on the best point estimate, Kate on development PR-AUC with a sign test, and Benjamin and Samantha on paired bootstrap intervals. With 134 converters, a point or two is noise.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decision 11 and the success section ("compare on the same bootstrap draws, not by checking whether two intervals overlap"). BPS: "several models will be compared".</p>
+    <div class="options">
+      <div class="opt rec"><h4>Paired couple-clustered bootstrap; simplest model unless a gain's interval is above zero <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Matches the EDA; guards against picking a lucky model</li></ul><span class="lbl">Cons</span><ul><li>Will usually pick the simplest model, since most gains are within noise</li></ul></div>
+      <div class="opt"><h4>Best point estimate</h4><span class="lbl">Pros</span><ul><li>Simple to explain</li></ul><span class="lbl">Cons</span><ul><li>Rewards noise with this few converters</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> the bootstrap rule, set in writing before results, with Kate's count of converters found by only one list as the plain-language version.</p>
+  </article>
+</section>
+
+<section>
+  <h2>Model and inputs</h2>
+
+  <article class="decision s-ok">
+    <header><h3>D9. Prospect model</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: all four of us ended on penalized logistic regression, but in different forms: Benjamin's tuned L1, Erin's untuned L2, Kate's L2 with log dollars and giving bands, and Samantha's ridge.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> BPS: "a classification model built for a rare outcome" and "several models will be compared". EDA modeling recommendation: threshold features or trees for the giving jumps; tuning inside training cohorts, grouped by couple.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Run the logistic variants on the shared data; choose by D8 in simplicity order <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Uses everyone's work; the choice is principled</li><li>Kate's bands are the EDA's threshold features</li></ul><span class="lbl">Cons</span><ul><li>A few hours of reruns</li></ul></div>
+      <div class="opt"><h4>Adopt one person's model as is</h4><span class="lbl">Pros</span><ul><li>Fastest</li></ul><span class="lbl">Cons</span><ul><li>Not compared on the same data; the choice looks arbitrary</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> report the tree models (LightGBM, random forest, boosting) as tried and set aside, since every notebook found them no better or worse.</p>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D10. Inputs</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: every notebook found solicitation and Passport add nothing once giving is known, and Jeff's notes say age has no planted effect in this release.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> BPS: "the 12-month outcome will be backtested with all inputs" and the project will show "whether engagement and viewing add anything". EDA feature table: use, test, training-only, sensitivity, and drop lists.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Backtest with all inputs; final model on the giving-history use list <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Meets the BPS and answers its engagement question</li><li>Simpler final model, no Passport consent dependency</li></ul><span class="lbl">Cons</span><ul><li>Engagement may matter on PBS's real records, so the test should be repeated there</li></ul></div>
+      <div class="opt"><h4>Keep all inputs in the final model</h4><span class="lbl">Pros</span><ul><li>No choice to defend</li></ul><span class="lbl">Cons</span><ul><li>Adds inputs that do nothing; harder to explain</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> keep age in the tested inputs but do not present it as a driver, and drop constituent type, which the EDA reserved for a sensitivity check.</p>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D11. Contact flags</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: Benjamin and Erin used the contacted and held-out flags in training only; Kate and Samantha left them out. Jeff's notes say the cultivation table is invented, and Benjamin's refit without the flags gave an identical top 1,000.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decision 8 (flags in training only, off when scoring); BPS: validation "controls for officer contact". Uplift models are out of scope (decision 8).</p>
+    <div class="options">
+      <div class="opt rec"><h4>Keep them training-only, as agreed <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Follows decision 8 and the BPS wording</li><li>Costs nothing, since the ranking is the same</li></ul><span class="lbl">Cons</span><ul><li>Keeps an invented table in the model</li></ul></div>
+      <div class="opt"><h4>Drop them</h4><span class="lbl">Pros</span><ul><li>Simpler; no invented table in the model</li></ul><span class="lbl">Cons</span><ul><li>Needs a revision to decision 8</li><li>Contact is then controlled only through the evaluation pools</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> keep them, and state that removing them leaves the ranking unchanged.</p>
+  </article>
+</section>
+
+<section>
+  <h2>Reporting</h2>
+
+  <article class="decision s-add">
+    <header><h3>D12. Reporting groups</h3><span class="pill add">Adds</span></header>
+    <p class="why">Why: Jeff's notes ask for propensity results for donors not selected for cultivation, a group the EDA did not define.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA: all eligible, never-major, and the no-contact pool; lapsed separately. BPS: "overall and for never-major donors".</p>
+    <div class="options">
+      <div class="opt rec"><h4>Add a not-selected group <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Answers Jeff's request; the only pool untouched by simulated contact in the test years</li></ul><span class="lbl">Cons</span><ul><li>About 25 converters, so its intervals are very wide</li></ul></div>
+      <div class="opt"><h4>Keep the EDA's groups only</h4><span class="lbl">Pros</span><ul><li>Fewer tables</li></ul><span class="lbl">Cons</span><ul><li>Ignores Jeff's request</li></ul></div>
+    </div>
+  </article>
+
+  <article class="decision s-add">
+    <header><h3>D13. Benchmarks</h3><span class="pill add">Adds</span></header>
+    <p class="why">Why: Kate added a 3-year total ranking, Samantha a decline-and-recency benchmark for retention, and Jeff's notes make the officer-selection benchmark illustrative.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decision 10 (prior-year bar, former major or $500 check, officer selection on held-out donors, RFV, threshold rules). BPS: beat prior-year giving, clear former major or $500, and report random, RFV, and officer selection.</p>
+    <div class="options">
+      <div class="opt rec"><h4>The agreed set, plus the 3-year total ranking; officer selection labeled illustrative <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Keeps the agreed bars; the 3-year total is a strong simple rule PBS could use</li></ul><span class="lbl">Cons</span><ul><li>One more row in each table</li></ul></div>
+      <div class="opt"><h4>Agreed set only</h4><span class="lbl">Pros</span><ul><li>No change</li></ul><span class="lbl">Cons</span><ul><li>Presents an invented benchmark as if it described PBS officers</li></ul></div>
+    </div>
+  </article>
+
+  <article class="decision s-amend">
+    <header><h3>D14. How results are framed</h3><span class="pill amend">Amends</span></header>
+    <p class="why">Why: Jeff's notes say results from this data validate methods, not findings about PBS Utah donors, and presentations should say so. Only one of the four notebooks currently does.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> the BPS's success measure (backtesting, recall at 1,000) stands, but its Benefit section talks about what the project will show about donors. A one-sentence revision would state that results validate the method on synthetic data and are framed as tests for PBS's own records.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Frame as validated methods and tests for PBS <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Required by Jeff; honest about the invented tables</li><li>Gives PBS a concrete next step</li></ul><span class="lbl">Cons</span><ul><li>Weaker-sounding headline numbers</li></ul></div>
+      <div class="opt"><h4>Present findings as about PBS donors</h4><span class="lbl">Pros</span><ul><li>Simpler story</li></ul><span class="lbl">Cons</span><ul><li>Contradicts the instructor's explicit guidance</li></ul></div>
+    </div>
+  </article>
+</section>
+
+<section>
+  <h2>Longer outcomes, tier, and calibration</h2>
+
+  <article class="decision s-ok">
+    <header><h3>D15. The 3 to 5 year outcome</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: only Benjamin modeled it, with a 3-year logistic model and a 5-year explainable boosting machine on legacy-era cohorts. Kate scored the 12 month model against 3-year outcomes, and Samantha and Erin described it.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> BPS: "backtested with giving history on earlier cohorts and reported as a projection". EDA modeling recommendation: giving-history models on legacy cohorts, with an all-feature 3-year check by grouped cross-validation on FY2021 and FY2022 as a secondary.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Giving-history models on earlier cohorts, as projections <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Exactly what the BPS promises; already built</li><li>The 5-year model is the only one to clear the never-major bar</li></ul><span class="lbl">Cons</span><ul><li>Tested on the legacy era, before the move to Unite</li></ul></div>
+      <div class="opt"><h4>Reuse the 12 month score (Kate)</h4><span class="lbl">Pros</span><ul><li>One model to maintain</li></ul><span class="lbl">Cons</span><ul><li>Not a 3 to 5 year model, so it does not meet the BPS; finds few late converters</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> also decide whether to run the EDA's secondary all-feature 3-year check, which none of us has done, or to note it as skipped.</p>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D16. Giving tier</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: no notebook could predict the tier better than "most converters land at $1,200". Kate recommends a two-level indicator, and Benjamin an expected mix.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> BPS: "the most likely giving tier ($1,200, $2,000, or $5,000+)" and "predicted tiers will be checked against the tier each donor reached (exact or within one)". EDA: three tiers, with $5,000+ flagged as poorly estimated.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Evaluate three tiers exact and within one; display an expected mix <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Meets the BPS check and reports the honest result</li></ul><span class="lbl">Cons</span><ul><li>"Within one" is nearly automatic with three tiers, which the notebook must say</li></ul></div>
+      <div class="opt"><h4>Two-level tier (Kate)</h4><span class="lbl">Pros</span><ul><li>The only split with some signal</li></ul><span class="lbl">Cons</span><ul><li>Departs from the BPS's three tiers</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> evaluate as the BPS says, and show Kate's two-level indicator in the dashboard as a labeled weak signal.</p>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D17. Calibration</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: every notebook found the list's ranking roughly calibrated but the yearly level off; the FY2025 check underpredicted conversions by about half in Benjamin's and Erin's models.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> BPS: calibration reported alongside recall, overall and for never-major donors. EDA: calibration check as a secondary measure.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Report calibration; give an expected-converter range <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Honest; Kate's range idea is easy for staff to use</li></ul><span class="lbl">Cons</span><ul><li>No single number for planning</li></ul></div>
+      <div class="opt"><h4>Recalibrate to the latest year</h4><span class="lbl">Pros</span><ul><li>Matches the influx level</li></ul><span class="lbl">Cons</span><ul><li>Assumes the influx continues; uses the FY2025 check year</li></ul></div>
+    </div>
+  </article>
+</section>
+
+<section>
+  <h2>Deliverables and scope</h2>
+
+  <article class="decision s-ok">
+    <header><h3>D18. Dashboard segments</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: Benjamin ranks the nurture segment by the 5-year model (2,000 donors); Kate uses ranks 1,001 to 5,000 of the 12 month score; Erin and Samantha produced no nurture list.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> BPS Scope: a working queue with probability, giving tier, key drivers, and former major status, split into Immediate priority (12 months) and Long-term nurture (3 to 5 years), with a backtest view.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Top 1,000 by 12 months; nurture ranked by the 3 to 5 year model <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Matches the BPS's segment definitions</li></ul><span class="lbl">Cons</span><ul><li>Nurture rests on a projection</li></ul></div>
+      <div class="opt"><h4>Nurture as the next ranks of the 12 month score</h4><span class="lbl">Pros</span><ul><li>One model</li></ul><span class="lbl">Cons</span><ul><li>Not a 3 to 5 year segment; low yield</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> set the nurture size with PBS (2,000 as a default) and flag donors that both longer models agree on.</p>
+  </article>
+
+  <article class="decision s-amend">
+    <header><h3>D19. Retention of current major donors</h3><span class="pill amend">Amends</span></header>
+    <p class="why">Why: PBS's major gift officers asked for a ranking of current major donors at risk of dropping, and Jeff suggested a risk ranking with dollars at risk. Samantha and Benjamin both built one and both beat simple benchmarks on the same donors. In this data, major donors who drop below $1,200 give up about $139,000 a year, about as much as new major donors give in their conversion year (about $136,000).</p>
+    <p class="fit"><strong>EDA and BPS:</strong> outside the current BPS, which covers non-major donors only, and not studied in the EDA. Decision 14 provides for revising the BPS, and PBS asked for this.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Add as a second workflow <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>What PBS asked for; two notebooks already agree</li><li>Uses the same data and validation</li></ul><span class="lbl">Cons</span><ul><li>Scope grows close to the November 11 deadline</li><li>Needs a BPS revision and an EDA note</li></ul></div>
+      <div class="opt"><h4>Present as a next phase</h4><span class="lbl">Pros</span><ul><li>No scope change</li></ul><span class="lbl">Cons</span><ul><li>Leaves PBS's request unanswered</li></ul></div>
+    </div>
+    <p class="rec-line"><strong>Recommendation:</strong> add it, using Samantha's top-25 and top-50 evaluation with dollars exposed and Benjamin's FY2026 risk list, and revise the BPS's Business Problem, Analytics Approach, and Scope to include it.</p>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D20. Former-major reactivation</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: Samantha treats former majors as a separate workflow and found prior-year giving ranks them as well as a model. Erin found the main model's gain comes from former majors.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> EDA decision 3 (former majors kept in the population, flagged, reported separately); BPS dashboard shows former major status.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Keep in the main model; report former majors separately <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Follows decision 3; one prospect model</li><li>Erin's composition table shows their share of the list</li></ul><span class="lbl">Cons</span><ul><li>Not a dedicated reactivation list</li></ul></div>
+      <div class="opt"><h4>Separate reactivation workflow (Samantha)</h4><span class="lbl">Pros</span><ul><li>A clear list for donors staff already know</li></ul><span class="lbl">Cons</span><ul><li>A third model with no gain over prior-year giving</li></ul></div>
+    </div>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D21. Final model artifact</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: only Erin saved and reload-tested her model, with scoring that always switches the training-only flags off.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> BPS Scope: "reproducible code and documentation".</p>
+    <div class="options">
+      <div class="opt rec"><h4>Erin's approach for the chosen model <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Reproducible; safe to rescore each year</li></ul><span class="lbl">Cons</span><ul><li>Some setup time</li></ul></div>
+      <div class="opt"><h4>Refit inside the notebook only</h4><span class="lbl">Pros</span><ul><li>Simpler</li></ul><span class="lbl">Cons</span><ul><li>Nothing for PBS to rerun</li></ul></div>
+    </div>
+  </article>
+
+  <article class="decision s-ok">
+    <header><h3>D22. Household de-duplication of the list</h3><span class="pill ok">Consistent</span></header>
+    <p class="why">Why: all lists are person-level, so a couple can take two places.</p>
+    <p class="fit"><strong>EDA and BPS:</strong> BPS lists "a household-level roll-up" as a possible later addition; the household rule counts a couple once for evaluation.</p>
+    <div class="options">
+      <div class="opt rec"><h4>Person-level list with a couple flag <span class="tag">Recommended</span></h4><span class="lbl">Pros</span><ul><li>Matches the BPS scope; staff can merge couples themselves</li></ul><span class="lbl">Cons</span><ul><li>A few places may go to spouses</li></ul></div>
+      <div class="opt"><h4>De-duplicate households now</h4><span class="lbl">Pros</span><ul><li>Cleaner list</li></ul><span class="lbl">Cons</span><ul><li>Moves a later addition into scope</li></ul></div>
+    </div>
+  </article>
+</section>
+
+<section class="prose">
+  <h2>Revisions the team documents would need</h2>
+  <p>If the team accepts every recommendation, the BPS needs two revisions and the EDA none:</p>
+  <ul>
+    <li><strong>D14, framing:</strong> one sentence in the BPS's Benefit or Success section that results on the synthetic release validate the method and are presented as tests for PBS's own records.</li>
+    <li><strong>D19, retention:</strong> add current major donors at risk of dropping to the Business Problem, the Analytics Approach (risk ranking with dollars at risk, not recoverable revenue), and the Scope (a risk list next to the working queue).</li>
+  </ul>
+  <p>Choosing the non-recommended option in D7 (FY2014 window) or D11 (drop contact flags) would add a revision to EDA decision 5 or 8, and Kate's two-level tier in D16 would change the BPS's tier wording.</p>
+</section>
+
+</main>
+</body>
+</html>

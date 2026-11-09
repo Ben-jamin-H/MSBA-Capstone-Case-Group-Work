@@ -1,24 +1,15 @@
-# data release and generated cache are never committed
+# the raw course data release (913 MB, three files over GitHub's 100 MB limit) stays out;
+# the Parquet cache built from it (data_cache/) is committed, and both notebooks run from it
 tables/
-data_cache/
-*.csv
-*.parquet
 
 # Quarto and Python artifacts
 .quarto/
 *_files/
 __pycache__/
 *.py[cod]
+catboost_info/
 
 # OS and editor files
 .DS_Store
 Thumbs.db
 .vscode/
-
-# Kate's master data dictionary is source, not data
-!data_dictionary_combined.csv
-
-# modeling: saved fits and generated lists are rebuilt from the data, never committed
-model_cache/
-outputs/
-catboost_info/

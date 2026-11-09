@@ -2206,7 +2206,7 @@ environment = pl.DataFrame([
 show(environment, caption="Software versions used to render this notebook")
 ```
 
-- **Data.** The nine CSV files go in `../tables` relative to this notebook. They are not committed. The first render converts them to Parquet files in `data_cache/`, and later renders read the cache. Delete `data_cache/` after any change to the raw files.
+- **Data.** The repository includes `data_cache/`, the nine course tables converted to Parquet, and the notebook reads them from there, so the raw CSV files are not needed. To rebuild the cache from the raw release, put the nine CSV files in `../tables` relative to this notebook and delete `data_cache/`; the next render converts them again.
 - **Build.** All cleaning, panel, cohort, and feature code lives in `build_panel.py`. The notebook only analyzes what the script builds.
 - **Randomness.** Every bootstrap uses seed 20261009 and 1,000 resamples, and couples are sorted before resampling, so two renders give identical numbers.
 - **Rendering.** `quarto render pbs_utah_group_eda.qmd`. The notebook was rendered with Quarto 1.10, and a full render took two to four minutes on a laptop, most of it in the bootstrap intervals.

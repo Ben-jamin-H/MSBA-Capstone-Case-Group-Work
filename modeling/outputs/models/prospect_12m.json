@@ -1,0 +1,28 @@
+{
+  "model": "prospect_12m",
+  "target": "y_12m",
+  "train_start": 2021,
+  "train_end": 2025,
+  "training_rows": 160919,
+  "features": [
+    "prior_total",
+    "former_major",
+    "years_last5",
+    "years_since_first_gift",
+    "legacy_years",
+    "change_from_last_year",
+    "two_years_before",
+    "largest_gift_share",
+    "sustainer",
+    "monthly_amount",
+    "soft_before",
+    "age_at_t",
+    "gender",
+    "contacted",
+    "held_out"
+  ],
+  "scoring": "contact flags switched off (scoring_view)",
+  "sklearn": "1.9.1",
+  "polars": "1.38.1",
+  "sha256": "a7df69c994def9b8253fd0e56d74a332a560ef349b9667ee4cf4d336707b29a5"
+}

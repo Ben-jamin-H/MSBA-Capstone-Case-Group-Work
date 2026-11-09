@@ -1,0 +1,26 @@
+{
+  "model": "retention",
+  "target": "y_drop",
+  "train_start": 2021,
+  "train_end": 2025,
+  "training_rows": 503,
+  "features": [
+    "prior_total",
+    "former_major",
+    "years_last5",
+    "years_since_first_gift",
+    "legacy_years",
+    "change_from_last_year",
+    "two_years_before",
+    "largest_gift_share",
+    "sustainer",
+    "monthly_amount",
+    "soft_before",
+    "age_at_t",
+    "gender"
+  ],
+  "scoring": "contact flags switched off (scoring_view)",
+  "sklearn": "1.9.1",
+  "polars": "1.38.1",
+  "sha256": "3d6dc931d8c101c2b21fbcc87379bfa96ddc0ee9e017a70b8716c249bc390638"
+}
