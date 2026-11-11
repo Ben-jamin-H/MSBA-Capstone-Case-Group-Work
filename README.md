@@ -15,6 +15,10 @@ GitHub shows `.html` files as code rather than as a web page. To read a rendered
 
 The Word document in `business_problem/` keeps its tracked changes, so download it to see them.
 
+## What the modeling notebook is for
+
+The course data are synthetic, so no number in the notebook is a fact about PBS Utah's donors. The notebook hands PBS Utah a procedure to run on its own records: write down the best list an officer could build by hand and test whether a model beats it; rank by expected dollars and check whether that changes anything; read the list size off a curve of return against size; do the same for retention; and put both lists in dollars per name worked to decide which call comes next. The numbers in the notebook are one run of that procedure. On this release the rules did as well as the models at every job, so the recommended lists are rule-ordered and the models supply probabilities and expected amounts alongside them. The six steps added after the instructor's review are decisions D23 to D28, each dated and explained in the notebook's Introduction.
+
 ## What is here
 
 | Path | What it is |
@@ -23,10 +27,10 @@ The Word document in `business_problem/` keeps its tracked changes, so download 
 | `build_panel.py` | Shared build script: loading, cleaning, the donor-year panel, cohorts, and giving features. Both notebooks use it |
 | `data_cache/` | The nine course tables, typed and converted to Parquet. Both notebooks read the data from here |
 | `data_dictionary_combined.csv` | Kate's master data dictionary, used in the EDA appendix |
-| `modeling/pbs_utah_group_modeling.qmd` / `.html` | Group modeling notebook (source and rendered) |
+| `modeling/pbs_utah_group_modeling.qmd` / `.html` | Group modeling notebook (source and rendered), including the six amendments (D23 to D28) made after the instructor's review on November 11 |
 | `modeling/requirements.txt` | Python packages for both notebooks |
 | `modeling/model_cache/` | Saved model fits, so a render does not have to refit everything |
-| `modeling/outputs/` | FY2026 lists (`working_queue_FY2026.csv`, `nurture_FY2026.csv`, `major_donor_risk_FY2026.csv`) and the four saved models with their records |
+| `modeling/outputs/` | FY2026 lists and the four saved models with their records. `working_queue_FY2026.csv` is ordered by the officer rule (former major donors first, then FY2026 giving, then years of giving) and carries the model's probability and rank, the expected giving if the donor converts, and the expected-increase rank; `working_queue_FY2026_expected_increase_additions.csv` holds the few donors the expected-increase ordering would add; `nurture_FY2026.csv` is the 3 to 5 year list; `major_donor_risk_FY2026.csv` carries the model's drop probability and four orderings (model probability, first-time rule, dollars at risk by the model and by the tenure table) |
 | `team_decisions/` | The group modeling decisions page and the team modeling synthesis |
 | `business_problem/` | The revised business problem statement draft, with tracked changes |
 
@@ -51,7 +55,7 @@ quarto render pbs_utah_group_modeling.qmd --no-execute-daemon
 ```
 
 - The EDA takes about 3 to 4 minutes.
-- The modeling notebook takes 6 to 10 minutes using the saved fits in `model_cache/`, and about 50 minutes if it has to refit everything.
+- The modeling notebook takes about 10 minutes using the saved fits in `model_cache/`, and about 55 minutes if it has to refit everything.
 - Use `--no-execute-daemon`. A Python kernel left running by an earlier render can hold several gigabytes of memory, which makes the modeling notebook's longest fits fail on a 16 GB laptop.
 - Both renders are reproducible: every bootstrap and every model uses a fixed seed.
 
